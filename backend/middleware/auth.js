@@ -1,23 +1,28 @@
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const COOKIE_NAME = process.env.COOKIE_NAME || 'upivot_session';
+const JWT_SECRET = process.env.JWT_SECRET || 'please_change_me';
+
+
 async function requireAuth(req, res, next) {
   try {
-    console.log('Auth middleware token (mock):', req.cookies);
-    const token = req.cookies && req.cookies['upivot_session'];
-    if (!token) {
-      console.log('No token found, sending mock 401');
-      return res.status(401).json({ error: 'No auth cookie (mock)' });
-    }
+    const token = req.cookies && req.cookies[COOKIE_NAME];
+    console.log('Auth middleware token:', token);
+    if (!token) return res.status(401).json({ error: { code: 'unauthenticated', message: 'No auth cookie' } });
 
-    const payload = { sub: 'mockUserId' };
-    console.log('Decoded JWT payload (mock):', payload);
+    const payload = jwt.verify(token, JWT_SECRET);
+    console.log('Decoded JWT payload:', payload); 
 
-    const user = { _id: 'mockUserId', name: 'Test User', email: 'test@example.com' };
-    console.log('Found user (mock):', user);
+    const user = await User.findById(payload.sub).select('-__v');
+    console.log('Found user:', user); 
+
+    if (!user) return res.status(401).json({ error: { code: 'unauthenticated', message: 'User not found' }});
 
     req.user = user;
     next();
   } catch (err) {
-    console.error('Auth middleware error (mock):', err);
-    return res.status(401).json({ error: 'Invalid token (mock)' });
+    console.error('Auth middleware error:', err);
+    return res.status(401).json({ error: { code: 'unauthenticated', message: 'Invalid token' } });
   }
 }
 
