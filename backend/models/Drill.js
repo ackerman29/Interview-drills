@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const QuestionSchema = new mongoose.Schema({
   qid: { type: String, required: true },
   prompt: { type: String, required: true },
-  options: { type: [String], required: true },       // MCQ options
-  correctAnswer: { type: String, required: true }    // Correct option
+  options: { type: [String], required: true },       
+  correctAnswer: { type: String, required: true }    
 }, { _id: false });
 
 const DrillSchema = new mongoose.Schema({
