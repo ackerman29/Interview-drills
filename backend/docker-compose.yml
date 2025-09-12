@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  backend:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - MONGO_URL=mongodb://mongo:27017/upivot-mini
+      - JWT_SECRET=devsecret_replace
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CALLBACK_URL=http://localhost:4000/auth/google/callback
+      - FRONTEND_URL=http://localhost:5173
+      - COOKIE_NAME=upivot_session
+    depends_on:
+      - mongo
+    volumes:
+      - .:/usr/src/app
+    command: npm run dev
+  mongo:
+    image: mongo:6
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
