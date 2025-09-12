@@ -24,12 +24,18 @@ router.post('/attempts', requireAuth, async (req, res) => {
     }
 
     const drill = await Drill.findById(drillId).lean();
-    if (!drill) {
+    if (!drill)
+        {
       return res.status(404).json({ error: { code: 'not_found', message: 'Drill not found' } });
     }
 
-    
+ let correctCount = 0;
+drill.questions.forEach((q) => {
+  const userAnswerObj = answers.find(a => a.qid === q.qid);
+  if (userAnswerObj?.text === q.correctAnswer) correctCount++;
+});
 
+const score = Math.round((correctCount / drill.questions.length) * 100);
 
 
     const attempt = await Attempt.create({
