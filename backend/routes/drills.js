@@ -3,6 +3,10 @@ const router = express.Router();
 const Drill = require('../models/Drill');
 
 
+let cache = null;
+let cacheExpires = 0;
+const CACHE_TTL_MS = 60 * 1000; 
+
 router.get('/', async (req, res, next) =>{
   try
   {
