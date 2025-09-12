@@ -16,7 +16,9 @@ router.get('/me', requireAuth, (req, res) => {
 
 router.post('/attempts', requireAuth, async (req, res) => {
   try {
-   
+   console.log('req.user:', req.user);
+   console.log('req.body:', req.body);
+
     const { drillId, answers } = req.body;
 
     if (!drillId || !answers || !Array.isArray(answers)) {
