@@ -1,60 +1,42 @@
 const express = require('express');
+const passport = require('passport');
+const jwt = require('jsonwebtoken');
+
 const router = express.Router();
-const { requireAuth } = require('../middleware/auth');
-const Attempt = require('../models/Attempt');
-const Drill = require('../models/Drill');
+const User = require('../models/User');
 
 
 
-router.get('/health', (req, res) => res.json({ ok: true }));
+const COOKIE_NAME = process.env.COOKIE_NAME || 'upivot_session';
+const JWT_SECRET = process.env.JWT_SECRET || 'please_change_me';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-router.get('/me', requireAuth, (req, res) => {
-  const { _id, email, name, picture, providers, createdAt } = req.user;
-  res.json({ user: { id: _id, email, name, picture, providers, createdAt } });
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: `${FRONTEND_URL}/?auth=fail` }), async (req, res) => {
+  const user = req.user;
+  const payload = {
+    sub: user._id.toString(),
+    email: user.email,
+    name: user.name
+  };
+
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
+
+  const isProd = process.env.NODE_ENV === 'production';
+  res.cookie(COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    maxAge: 1000 * 60 * 60 * 24 * 7 
+  });
+
+  res.redirect(`${FRONTEND_URL}/dashboard`);
 });
 
-
-router.post('/attempts', requireAuth, async (req, res) => {
-  try {
-   
-    const { drillId, answers } = req.body;
-
-    if (!drillId || !answers || !Array.isArray(answers)) {
-      return res.status(400).json({ error: { code: 'invalid_input', message: 'drillId and answers are required' } });
-    }
-
-    const drill = await Drill.findById(drillId).lean();
-    if (!drill) {
-      return res.status(404).json({ error: { code: 'not_found', message: 'Drill not found' } });
-    }
-
-    
-
-
-
-    const attempt = await Attempt.create({
-      userId: req.user._id,
-      drillId,
-      answers,
-      score,
-      createdAt: new Date(),
-    });
-
-    res.json({ attemptId: attempt._id, score });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: { code: 'server_error', message: 'Something went wrong' } });
-  }
-});
-
-
-router.get('/attempts', requireAuth, async (req, res) => {
-  const limit = Math.min(parseInt(req.query.limit || '5', 10), 50);
-  const attempts = await Attempt.find({ userId: req.user._id })
-    .sort({ createdAt: -1 })
-    .limit(limit)
-    .lean();
-  res.json({ attempts });
+router.post('/signout', (req, res) => {
+  res.clearCookie(COOKIE_NAME, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' });
+  return res.json({ ok: true });
 });
 
 module.exports = router;
