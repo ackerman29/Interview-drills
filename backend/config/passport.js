@@ -29,12 +29,10 @@ passport.use(new GoogleStrategy({
 
     let user = await User.findOne({ 'providers.provider': 'google', 'providers.providerId': providerId });
     if (!user) {
-      // check by email
       user = await User.findOne({ email });
     }
 
     if (user) {
-      // ensure provider entry exists
       const hasProvider = user.providers.some(p => p.provider === 'google' && p.providerId === providerId);
       if (!hasProvider) {
         user.providers.push({ provider: 'google', providerId });
@@ -43,7 +41,6 @@ passport.use(new GoogleStrategy({
       return done(null, user);
     }
 
-    // create new
     const newUser = new User({
       email,
       name,

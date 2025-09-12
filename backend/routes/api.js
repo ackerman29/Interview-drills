@@ -15,9 +15,9 @@ router.get('/me', requireAuth, (req, res) => {
 
 
 router.post('/attempts', requireAuth, async (req, res) => {
-  try {
-   console.log('req.user:', req.user);
-   console.log('req.body:', req.body);
+  try {//added debugger
+    console.log('req.user:', req.user);
+    console.log('req.body:', req.body);
 
     const { drillId, answers } = req.body;
 
@@ -32,7 +32,7 @@ router.post('/attempts', requireAuth, async (req, res) => {
     }
 
  let correctCount = 0;
-drill.questions.forEach((q) => {
+  drill.questions.forEach((q) => {
   const userAnswerObj = answers.find(a => a.qid === q.qid);
   if (userAnswerObj?.text === q.correctAnswer) correctCount++;
 });
