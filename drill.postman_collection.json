@@ -1,0 +1,18 @@
+{
+	"info": {
+		"_postman_id": "f200accc-3ee6-47fc-882b-38b7910c7414",
+		"name": "drill",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33070966"
+	},
+	"item": [
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
