@@ -62,7 +62,8 @@ http://localhost:5173
 ```bash
 k6 run k6_test.js
 ```
-
+k6 evidence
+<img width="948" height="735" alt="Screenshot 2025-09-13 at 3 24 56 PM" src="https://github.com/user-attachments/assets/9dd43239-4bd7-4893-b8dc-b191943f6bb8" />
 
 
 
