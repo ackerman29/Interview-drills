@@ -26,44 +26,72 @@ This assignment demonstrates full-stack development skills, including authentica
 7. Load testing with k6: ensure cached drills route responds efficiently (p95 < 150ms locally).
 
 
-**To Start the app:**
+## Getting Started
 
-1. Copy the .env.example to .env and fill in the values.
-```bash 
-cp .env.example .env 
+Follow these steps to set up and run the application:
+
+### 1. Install Dependencies
+
+Clone the repository, then run the following command in both the `frontend` and `backend` directories:
+
+```bash
+npm install
 ```
 
-2. Start Backend 
+### 2. Configure Environment Variables
+
+Copy the example environment file and update the values as needed:
+
+```bash
+cp .env.example .env
+```
+
+### 3. Start the Backend
+
+Build and start the backend services using Docker Compose:
+
 ```bash
 docker compose down
 docker compose up --build
 ```
 
-3. Open a terminal inside the backend container:
+### 4. Seed the Database
+
+Open a shell inside the backend container and run the seed script to populate the drills collection in MongoDB:
+
 ```bash
 docker compose exec backend sh
-```
-This populates the drills collection in MongoDB.
-```bash
 node seed/seedDrills.js
 ```
 
-4. To check Api health
+### 5. Check API Health
+
+Verify the backend API is running:
+
 ```bash
 curl http://localhost:4000/api/health
 ```
 
-5. Start the frontend
-```bash
+### 6. Start the Frontend
+
+Access the frontend application in your browser:
+
+```
 http://localhost:5173
 ```
 
-6. For k6 load testing run this command in root directory:
+### 7. Run k6 Load Testing
+
+Execute the following command from the project root to run k6 load tests:
+
 ```bash
 k6 run k6_test.js
 ```
-k6 evidence
-<img width="948" height="735" alt="Screenshot 2025-09-13 at 3 24 56 PM" src="https://github.com/user-attachments/assets/9dd43239-4bd7-4893-b8dc-b191943f6bb8" />
+
+#### k6 Test Evidence
+
+![k6 test screenshot](https://github.com/user-attachments/assets/9dd43239-4bd7-4893-b8dc-b191943f6bb8)
+
 
 
 
