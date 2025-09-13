@@ -1,10 +1,10 @@
 // src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Landing from './pages/Landing';
+import Landing from './pages/Landing/Landing';
 import Dashboard from './pages/Dashboard/Dashboard';
-import Drill from './pages/Drill';
-import History from './pages/History';
+import Drill from './pages/Drill/Drill';
+import History from './pages/History/History';
 
 function App() {
   return (
