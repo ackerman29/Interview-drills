@@ -1,14 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
 
-const Dashboard = () => {
-  const [drills, setDrills] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
-  const styles = {
+export const styles = {
     container: {
       minHeight: '100vh',
       width: '100%',
@@ -236,7 +228,7 @@ const Dashboard = () => {
     },
   };
 
-  const getDifficultyStyle = (difficulty) => {
+  export const getDifficultyStyle = (difficulty) => {
     const baseStyle = styles.difficultyBadge;
     switch (difficulty?.toLowerCase()) {
       case 'easy':
@@ -249,140 +241,3 @@ const Dashboard = () => {
         return { ...baseStyle, background: 'rgba(107, 114, 128, 0.1)', color: '#6b7280' };
     }
   };
-
-  const [hoveredCard, setHoveredCard] = useState(null);
-
-  useEffect(() => {
-    const fetchDrills = async () => {
-      try {
-        const res = await axios.get('http://localhost:4000/api/drills', {
-          withCredentials: true,
-        });
-        setDrills(res.data.drills);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch drills');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDrills();
-  }, []);
-
-  if (loading) {
-    return (
-      <div style={styles.loadingContainer}>
-        <p style={styles.loadingText}>Loading drills...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div style={styles.errorContainer}>
-        <p style={styles.errorText}>{error}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div style={styles.container}>
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 0.4; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(1.05); }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          33% { transform: translateY(-20px) rotate(120deg); }
-          66% { transform: translateY(10px) rotate(240deg); }
-        }
-      `}</style>
-
-      {/* Background elements */}
-      <div style={styles.backgroundBlob1}></div>
-      <div style={styles.backgroundBlob2}></div>
-      <div style={styles.backgroundBlob3}></div>
-      
-      {/* Floating dots */}
-      <div style={{...styles.floatingDots, top: '20%', left: '15%', animationDelay: '0s'}}></div>
-      <div style={{...styles.floatingDots, top: '70%', right: '20%', animationDelay: '3s'}}></div>
-      <div style={{...styles.floatingDots, bottom: '30%', left: '30%', animationDelay: '6s'}}></div>
-      <div style={{...styles.floatingDots, top: '40%', right: '40%', animationDelay: '2s'}}></div>
-
-      <div style={styles.contentContainer}>
-        {/* Header */}
-        <div style={styles.headerCard}>
-          <div style={styles.titleGlow}></div>
-          <h1 style={styles.title}>Available Drills</h1>
-        </div>
-
-        <button 
-          style={styles.historyButton}
-          onClick={() => navigate('/history')}
-          onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
-          onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
-        >
-          History
-        </button>
-
-        {/* Drills Grid */}
-        {drills.length === 0 ? (
-          <div style={styles.emptyState}>
-            <p style={styles.emptyStateText}>No drills available at the moment</p>
-          </div>
-        ) : (
-          <div style={styles.drillsGrid}>
-            {drills.map((drill) => (
-              <Link
-                key={drill._id}
-                to={`/drill/${drill._id}`}
-                style={{
-                  ...styles.drillCard,
-                  ...(hoveredCard === drill._id ? styles.drillCardHover : {})
-                }}
-                onMouseEnter={() => setHoveredCard(drill._id)}
-                onMouseLeave={() => setHoveredCard(null)}
-              >
-                <div 
-                  style={{
-                    ...styles.drillCardGlow,
-                    opacity: hoveredCard === drill._id ? 1 : 0
-                  }}
-                ></div>
-                
-                <h3 style={styles.drillTitle}>{drill.title}</h3>
-                
-                <div style={styles.drillMeta}>
-                  <div style={styles.difficultyContainer}>
-                    <span style={styles.difficultyLabel}>Difficulty:</span>
-                    <span style={getDifficultyStyle(drill.difficulty)}>
-                      {drill.difficulty || 'Not specified'}
-                    </span>
-                  </div>
-                  
-                  {drill.tags && drill.tags.length > 0 && (
-                    <div style={styles.tagsContainer}>
-                      <span style={styles.tagsLabel}>Tags:</span>
-                      {drill.tags.slice(0, 3).map((tag, index) => (
-                        <span key={index} style={styles.tag}>
-                          {tag}
-                        </span>
-                      ))}
-                      {drill.tags.length > 3 && (
-                        <span style={styles.tag}>+{drill.tags.length - 3} more</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default Dashboard;
